@@ -1,17 +1,13 @@
 <template>
-  <div id="app">
-    <router-view/>
+  <div>
+    <p>角色列表</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
 }
 </script>
 
 <style>
-#app {
-  height: 100%;
-}
 </style>
