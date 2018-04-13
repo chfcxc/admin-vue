@@ -34,50 +34,82 @@
       </el-table-column>
       <el-table-column
         prop="mobile"
-        label="电话">
+        label="电话"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        label="用户状态"
+        width="100">
+        <template slot-scope="scope">
+          <!--在这里可以拿到scope.row拿到当前遍历对象-->
+          <el-switch
+            v-model="scope.row.mg_state"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="操作"
+        width="200">
+        <template slot-scope="scope">
+          <el-button size="mini" type="primary" icon="el-icon-edit"></el-button>
+          <el-button size="mini" type="danger" icon="el-icon-delete"></el-button>
+          <el-button size="mini" type="danger" icon="el-icon-delete"></el-button>
+        </template>
       </el-table-column>
     </el-table>
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="4"
-      :page-sizes="[100, 200, 300, 400]"
-      :page-size="100"
+      :current-page="currentPage"
+      :page-sizes="[1,2,3,4,5]"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400">
+      :total="totalSize">
     </el-pagination>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 export default {
   async created () {
-    const {token} = JSON.parse(window.localStorage.getItem('admin-token'))
-    const res = await axios.get('http://localhost:8888/api/private/v1/users', {
-      headers: {
-        Authorization: token // 配置请求头携带令牌
-      },
-      params: { // 请求参数， 对象会被转换成 k=v&k=v 的格式，然后拼接到请求路径?的后边
-        pagenum: 1,
-        pagesize: 5
-      }
-    })
-    console.log(res)
-    this.tableData = res.data.data.users
+    this.loadUsersByPage(1)
   },
   data () {
     return {
       tableData: [],
-      searchText: ''
+      searchText: '',
+      currentPage: 1,
+      totalSize: 0,
+      pageSize: 1
     }
   },
   methods: {
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+    handleSizeChange (pageSize) {
+      this.pageSize = pageSize
+      this.loadUsersByPage(1, pageSize)
+      // 让分页组件的页码回归到1
+      this.currentPage = 1
+      // console.log(`每页 ${pageSize} 条`)
     },
-    handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+    handleCurrentChange (currentPage) {
+      this.currentPage = currentPage
+      // 拿到当前的最新的每页多少条数据
+      this.loadUsersByPage(currentPage, this.pageSize)
+      // console.log(`当前页: ${currentPage}`)
+    },
+    // 根据页码加载用户列表数据
+    async loadUsersByPage (page, pageSize = 1) {
+      const res = await this.$http.get('/users', {
+        params: { // 请求参数， 对象会被转换成 k=v&k=v 的格式，然后拼接到请求路径?的后边
+          pagenum: page,
+          pagesize: pageSize
+        }
+      })
+      // console.log(res)
+      const {users, total} = res.data.data
+      this.tableData = users
+      this.totalSize = total
     }
   }
 }

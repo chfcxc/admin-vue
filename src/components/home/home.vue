@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import {removeUserInfo} from '@/assets/js/auth'
 export default {
   // beforeCreate () {
   //   // 如果没有登录就去跳去登录
@@ -88,7 +89,8 @@ export default {
         type: 'warning'
       }).then(() => { // 点击确认执行resolve函数
         // 删除本地存储中的Token 身份标识
-        window.localStorage.removeItem('admin-token')
+        // window.localStorage.removeItem('user-info')
+        removeUserInfo()
         // 跳转到登录页
         this.$router.push({
           name: 'login'

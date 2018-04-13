@@ -15,7 +15,8 @@
 </div>
 </template>
 <script>
-import axios from 'axios'
+// import axios from 'axios'
+import {saveUserInfo} from '@/assets/js/auth'
 export default {
   data () {
     return {
@@ -27,12 +28,13 @@ export default {
   },
   methods: {
     async login () {
-      const res = await axios.post('http://localhost:8888/api/private/v1/login', this.userForm)
+      const res = await this.$http.post('/login', this.userForm)
       // console.log(res)
       const data = res.data
       if (data.meta.status === 200) {
         // 登录成功 将服务器签发给用户的Token身份令牌记录到localStorage
-        window.localStorage.setItem('admin-token', JSON.stringify(data.data))
+        // window.localStorage.setItem('user-info', JSON.stringify(data.data))
+        saveUserInfo(data.data)
         this.$router.push({
           name: 'home'
         })
